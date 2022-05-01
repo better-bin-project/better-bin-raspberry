@@ -3,7 +3,7 @@ import serial
 
 port = '/dev/ttyUSB0'
 UV = '1'
-INFRARED = '2'
+RGB = '2'
 
 if __name__ == "__main__":
     ser = serial.Serial(port, 9600, 1)
@@ -15,8 +15,11 @@ def readUV():
         pass
     return int.from_bytes(ser.read(), byteorder = 'big')
     
-def readInfrared():
-    ser.write((INFRARED + '\n').encode('utf-8'))
-    while not ser.in_waiting:
-        pass
-    return int.from_bytes(ser.read(), byteorder = 'big')
+def readRGB():
+    ser.write((RGB + '\n').encode('utf-8'))
+    rgbData = {}
+    for key in ['r', 'g', 'b', 'c']:
+        while not ser.in_waiting:
+            pass
+        rgbData[key] = int.from_bytes(ser.read(), byteorder = 'big')
+    return rgbData
