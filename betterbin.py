@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 import serial
 
-port = '/dev/ttyUSB0'
+PORT = '/dev/ttyUSB0'
 UV = '1'
 RGB = '2'
-
-if __name__ == "__main__":
-    ser = serial.Serial(port, 9600, 1)
-    ser.reset_input_buffer()
 
 def readUV():
     ser.write((UV + '\n').encode('utf-8'))
@@ -23,3 +19,13 @@ def readRGB():
             pass
         rgbData[key] = int.from_bytes(ser.read(), byteorder = 'big')
     return rgbData
+
+if __name__ == "__main__":
+    ser = serial.Serial(PORT, 9600)
+    ser.reset_input_buffer()
+
+    try:
+        while True:
+            print(readUV())
+    except KeyboardInterrupt:
+        ser.close()
