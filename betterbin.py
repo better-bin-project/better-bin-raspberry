@@ -20,12 +20,20 @@ def readRGB():
         rgbData[key] = int.from_bytes(ser.read(), byteorder = 'big')
     return rgbData
 
+def printAll():
+    rgb = readRGB()
+    uv = readUV()
+    for key rgb:
+        print(key, rgb[key])
+    print('uv: ', uv)
+
+
 if __name__ == "__main__":
     ser = serial.Serial(PORT, 9600)
     ser.reset_input_buffer()
 
     try:
         while True:
-            print(readUV())
+            printAll()
     except KeyboardInterrupt:
         ser.close()
