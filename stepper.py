@@ -24,12 +24,21 @@ GPIO.output(DIR_2, GPIO.HIGH if forward2 else GPIO.LOW)
 # Does n steps with interval t (in s)
 # motorNum: 1 -> big motor; 2 -> small motor
 def doSteps(motorNum, n, t):
+    numSteps = n if n > 0 else -n
+    if n < 0:
+        reverse(motorNum)
     pul_pin = PUL_1 if motorNum == 1 else PUL_2
-    for i in range(n):
+    ena_pin = ENA_1 if motorNum == 1 else ENA_2
+    GPIO.output(ena_pin, GPIO.HIGH)
+
+    for i in range(numSteps):
         GPIO.output(pul_pin, GPIO.HIGH)
         sleep(t / 2)
         GPIO.output(pul_pin, GPIO.LOW)
         sleep(t / 2)
+    GPIO.output(ena_pin, GPIO.LOW)
+    if n < 0:
+        reverse(motorNum)
 
 def reverse(motorNum):
     global forward1
@@ -50,8 +59,4 @@ if __name__ == '__main__':
         motorNum = int(arr[0])
         numSteps = int(arr[1])
         interval = float(arr[2])
-        if numSteps < 0:
-            reverse(motorNum)
         doSteps(motorNum, numSteps, interval)
-        if numSteps < 0:
-            reverse(motorNum)

@@ -6,10 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-STEPS_1 = 100 # big motor
-INTERVAL_1 = 0.05
-STEPS_2 = 100 # small motor
-INTERVAL_2 = 0.05
+STEPS_PAPER = -1200 # big motor
+STEPS_PLASTIC = 1200
+STEPS_RESIDUAL = 0
+STEPS_BOX = 100 # small motor
 
 class Sftp:
     def __init__(self, hostname, username, password, port=22):
@@ -80,33 +80,47 @@ class Sftp:
         except Exception as err:
             raise Exception(err)
 
-print(os.environ.get('ENVY_PWD'))
+    def listdir(self, remote_path):
+        """lists all the files and directories in the specified path and returns them"""
+        return self.connection.listdir(remote_path)
+
 sftp = Sftp('192.168.0.147', 'finn', os.environ.get('ENVY_PWD'))
 sftp.connect()
+currentPos = 1200
 
 try:
-    os.system('raspistill -o img.jpg')
-    sftp.upload('img.jpg', '/home/finn/prg/better-bin-pc/img.jpg')
-    os.system('touch cmpl')
-    sftp.upload('cmpl', '/home/finn/prg/better-bin-pc/cmpl')
-    sleep(4)
-    sftp.download('/home/finn/prg/better-bin-pc/solution.txt', 'solution.txt')
+    while True:
+        if input() == 'next':
+            os.system('raspistill -o img.jpg')
+            sftp.upload('img.jpg', '/home/finn/prg/better-bin-pc/img.jpg')
+            os.system('touch cmpl_upload')
+            sftp.upload('cmpl_upload', '/home/finn/prg/better-bin-pc/cmpl_upload')
 
-    file = open('solution.txt')
-    category = file.readline()
-    print(f'Image classified as {category}')
+            ml_finished = False
+            while not ml_finished:
+                directory = sftp.listdir('/home/finn/prg/better-bin-pc/')
+                if 'cmpl_ml' in directory:
+                    ml_finished = True
 
-    if (category == 'paper'):
-        pass
-    elif (category == 'plastic'):
-        pass
-    else:
-        pass
+            sftp.download('/home/finn/prg/better-bin-pc/solution.txt', 'solution.txt')
 
-    stepper.doSteps(2, STEPS_2, INTERVAL_2)
-    stepper.reverse(2)
-    stepper.doSteps(2, STEPS_2, INTERVAL_2)
+            file = open('solution.txt')
+            category = file.readline()
+            print(f'Image classified as {category}')
 
-    sftp.disconnect()
+            if (category == 'paper'):
+                stepper.doSteps(1, STEPS_PAPER - currentPos, 0.005)
+                currentPos = STEPS_PAPER
+            elif (category == 'plastic'):
+                stepper.doSteps(1, STEPS_PLASTIC - currentPos, 0.005)
+                currentPos = STEPS_PLASTIC
+            else:
+                stepper.doSteps(1, STEPS_RESIDUAL - currentPos, 0.005)
+                currentPos = STEPS_RESIDUAL
+            
+            stepper.doSteps(2, 500, 0.01)
+            stepper.doSteps(2, -500, 0.01)
+            print(f"Current position: {currentPos}")
+
 except KeyboardInterrupt:
     sftp.disconnect()
