@@ -9,7 +9,7 @@ load_dotenv()
 STEPS_PAPER = -1200 # big motor
 STEPS_PLASTIC = 1200
 STEPS_RESIDUAL = 0
-STEPS_BOX = 100 # small motor
+STEPS_BOX = 500 # small motor
 
 class Sftp:
     def __init__(self, hostname, username, password, port=22):
@@ -61,7 +61,7 @@ class Sftp:
     def listdir(self, remote_path):
         return self.connection.listdir(remote_path)
 
-sftp = Sftp('192.168.0.147', 'finn', os.environ.get('ENVY_PWD'))
+sftp = Sftp('192.168.0.147', 'sftpu', os.environ.get('SFTP_PWD'))
 sftp.connect()
 currentPos = 1200
 
@@ -69,17 +69,17 @@ try:
     while True:
         if input() == 'next':
             os.system('raspistill -o img.jpg')
-            sftp.upload('img.jpg', '/home/finn/prg/better-bin-pc/img.jpg')
+            sftp.upload('img.jpg', 'img.jpg')
             os.system('touch cmpl_upload')
-            sftp.upload('cmpl_upload', '/home/finn/prg/better-bin-pc/cmpl_upload')
+            sftp.upload('cmpl_upload', 'cmpl_upload')
 
             ml_finished = False
             while not ml_finished:
-                directory = sftp.listdir('/home/finn/prg/better-bin-pc/')
+                directory = sftp.listdir('./')
                 if 'cmpl_ml' in directory:
                     ml_finished = True
 
-            sftp.download('/home/finn/prg/better-bin-pc/solution.txt', 'solution.txt')
+            sftp.download('solution.txt', 'solution.txt')
 
             file = open('solution.txt')
             category = file.readline()
@@ -95,8 +95,8 @@ try:
                 stepper.doSteps(1, STEPS_RESIDUAL - currentPos, 0.005)
                 currentPos = STEPS_RESIDUAL
             
-            stepper.doSteps(2, 500, 0.01)
-            stepper.doSteps(2, -500, 0.01)
+            stepper.doSteps(2, STEPS_BOX, 0.01)
+            stepper.doSteps(2, -STEPS_BOX, 0.01)
             print(f"Current position: {currentPos}")
 
 except KeyboardInterrupt:
