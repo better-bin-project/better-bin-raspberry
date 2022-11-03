@@ -3,14 +3,19 @@ import numpy as np
 import stepper
 import argparse
 import os
+import RPi.GPIO as GPIO
 
 TOTAL_STEPS = 14500
 STEPS_BOX = 3200
 STEPS_DELAY = 0.0005
+BUTTON_PIN = 17
 
 STEPS_PAPER = 0
 STEPS_RESIDUAL = int(TOTAL_STEPS / 2)
 STEPS_PLASTIC = TOTAL_STEPS
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BUTTON_PIN, GPIO.IN)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-m', '--model', default='resnet50',
@@ -65,9 +70,6 @@ img_dict = {
     'washer': 'plastic'
 }
 
-def next_image():
-    return input() == 'next'
-
 def recognize(modelname, imgpath):
     image = tf.keras.preprocessing.image.load_img(imgpath,
         target_size=(224, 224))
@@ -87,11 +89,14 @@ def recognize(modelname, imgpath):
     return (processed_preds[0][0][1], processed_preds[0][0][2])
 
 currentPos = 0
+currentButtonPos = bool(GPIO.input(BUTTON_PIN))
 
 try:
     print("Ready. Enter 'next' to classify a piece of trash.")
     while True:
-        if next_image():
+        if bool(GPIO.input(BUTTON_PIN)) != currentButtonPos:
+            currentButtonPos = not currentButtonPos
+
             os.system("libcamera-still -o img.jpg")
             res, prob = recognize(args['model'], 'img.jpg')
             print(res, prob)
