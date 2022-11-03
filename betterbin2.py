@@ -66,7 +66,7 @@ img_dict = {
 }
 
 def next_image():
-    pass
+    return input() == 'next'
 
 def recognize(modelname, imgpath):
     image = tf.keras.preprocessing.image.load_img(imgpath,
@@ -86,10 +86,10 @@ def recognize(modelname, imgpath):
     print(f"  {imgpath}: {processed_preds[0][0][1]} to {processed_preds[0][0][2]}")
     return (processed_preds[0][0][1], processed_preds[0][0][2])
 
-current_pos = 0
+currentPos = 0
 
 try:
-    print("Ready. Enter 'next' to classify a piece of trash: ")
+    print("Ready. Enter 'next' to classify a piece of trash.")
     while True:
         if next_image():
             os.system("libcamera-still -o img.jpg")
@@ -111,7 +111,7 @@ try:
 
             stepper.doSteps(2, STEPS_BOX, STEPS_DELAY)
             stepper.doSteps(2, -STEPS_BOX, STEPS_DELAY)
-            print("Ready. Enter 'next' to classify a piece of trash: ")
+            print("Ready. Enter 'next' to classify a piece of trash.")
 
 except KeyboardInterrupt():
     pass
