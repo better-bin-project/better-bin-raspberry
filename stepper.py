@@ -3,12 +3,12 @@ from time import sleep
 
 GPIO.setmode(GPIO.BCM)
 
-ENA_1 = 2
+ENA_1 = 4
 DIR_1 = 3
-PUL_1 = 4
-ENA_2 = 17
-DIR_2 = 27
-PUL_2 = 22
+PUL_1 = 2
+ENA_2 = 18
+DIR_2 = 15
+PUL_2 = 14
 
 for pin in [ENA_1, DIR_1, PUL_1, ENA_2, DIR_2, PUL_2]:
     GPIO.setup(pin, GPIO.OUT)
