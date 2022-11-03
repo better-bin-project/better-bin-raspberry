@@ -13,10 +13,10 @@ PUL_2 = 14
 for pin in [ENA_1, DIR_1, PUL_1, ENA_2, DIR_2, PUL_2]:
     GPIO.setup(pin, GPIO.OUT)
 
-GPIO.output(ENA_1, GPIO.LOW)
-GPIO.output(ENA_2, GPIO.LOW)
-GPIO.output(DIR_1, GPIO.HIGH)
-GPIO.output(DIR_2, GPIO.HIGH)
+GPIO.output(ENA_1, GPIO.HIGH)
+GPIO.output(ENA_2, GPIO.HIGH)
+GPIO.output(DIR_1, GPIO.LOW)
+GPIO.output(DIR_2, GPIO.LOW)
 
 # Does n steps with interval t (in s)
 # motorNum: 1 -> big motor; 2 -> small motor
@@ -28,19 +28,19 @@ def doSteps(motorNum, n, t):
     numSteps = n if n > 0 else -n
 
     if n < 0:
-        GPIO.output(dir_pin, GPIO.LOW)
+        GPIO.output(dir_pin, GPIO.HIGH)
         sleep(0.5)
-    GPIO.output(ena_pin, GPIO.HIGH)
+    GPIO.output(ena_pin, GPIO.LOW)
 
     for i in range(numSteps):
-        GPIO.output(pul_pin, GPIO.HIGH)
-        sleep(t / 2)
         GPIO.output(pul_pin, GPIO.LOW)
         sleep(t / 2)
+        GPIO.output(pul_pin, GPIO.HIGH)
+        sleep(t / 2)
 
-    GPIO.output(ena_pin, GPIO.LOW)
+    GPIO.output(ena_pin, GPIO.HIGH)
     if n < 0:
-        GPIO.output(dir_pin, GPIO.HIGH)
+        GPIO.output(dir_pin, GPIO.LOW)
         sleep(0.5)
 
 if __name__ == '__main__':
