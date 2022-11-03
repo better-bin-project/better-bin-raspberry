@@ -3,3 +3,8 @@ img.jpg
 solution.txt
 cmpl_upload
 __pycache__
+bin/*
+lib/*
+lib64
+share/*
+pyvenv.cfg
