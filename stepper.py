@@ -10,6 +10,8 @@ ENA_2 = 18
 DIR_2 = 15
 PUL_2 = 14
 
+LIMIT_SWITCH_PIN = 23
+
 for pin in [ENA_1, DIR_1, PUL_1, ENA_2, DIR_2, PUL_2]:
     GPIO.setup(pin, GPIO.OUT)
 
@@ -17,6 +19,8 @@ GPIO.output(ENA_1, GPIO.HIGH)
 GPIO.output(ENA_2, GPIO.HIGH)
 GPIO.output(DIR_1, GPIO.LOW)
 GPIO.output(DIR_2, GPIO.LOW)
+
+GPIO.setup(LIMIT_SWITCH_PIN, GPIO.IN)
 
 # Does n steps with interval t (in s)
 # motorNum: 1 -> big motor; 2 -> small motor
@@ -33,6 +37,8 @@ def doSteps(motorNum, n, t):
     GPIO.output(ena_pin, GPIO.LOW)
 
     for i in range(numSteps):
+        if GPIO.input(LIMIT_SWITCH_PIN):
+            break
         GPIO.output(pul_pin, GPIO.LOW)
         sleep(t / 2)
         GPIO.output(pul_pin, GPIO.HIGH)

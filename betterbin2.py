@@ -5,8 +5,8 @@ import argparse
 import os
 import RPi.GPIO as GPIO
 
-TOTAL_STEPS = 14500
-STEPS_BOX = 3200
+TOTAL_STEPS = 14000
+STEPS_BOX = 3100
 STEPS_DELAY = 0.0005
 BUTTON_PIN = 17
 
@@ -92,9 +92,11 @@ currentPos = 0
 currentButtonPos = bool(GPIO.input(BUTTON_PIN))
 
 try:
+    stepper.doSteps(1, -TOTAL_STEPS, STEPS_DELAY)
+
     print("Ready. Enter 'next' to classify a piece of trash.")
     while True:
-        if bool(GPIO.input(BUTTON_PIN)) != currentButtonPos:
+        if (bool(GPIO.input(BUTTON_PIN)) != currentButtonPos) or input() == "next":
             currentButtonPos = not currentButtonPos
 
             os.system("libcamera-still -o img.jpg")
