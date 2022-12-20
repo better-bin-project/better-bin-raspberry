@@ -88,17 +88,12 @@ def recognize(modelname, imgpath):
     print(f"  {imgpath}: {processed_preds[0][0][1]} to {processed_preds[0][0][2]}")
     return (processed_preds[0][0][1], processed_preds[0][0][2])
 
-currentPos = 0
-currentButtonPos = bool(GPIO.input(BUTTON_PIN))
-
 try:
     stepper.doSteps(1, -TOTAL_STEPS, STEPS_DELAY)
 
     print("Ready. Enter 'next' to classify a piece of trash.")
     while True:
-        if (bool(GPIO.input(BUTTON_PIN)) != currentButtonPos) or input() == "next":
-            currentButtonPos = not currentButtonPos
-
+        if (bool(GPIO.input(BUTTON_PIN)) or input() == "next":
             os.system("libcamera-still -o img.jpg")
             res, prob = recognize(args['model'], 'img.jpg')
             print(res, prob)

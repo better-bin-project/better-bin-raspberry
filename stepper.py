@@ -15,8 +15,8 @@ LIMIT_SWITCH_PIN = 23
 for pin in [ENA_1, DIR_1, PUL_1, ENA_2, DIR_2, PUL_2]:
     GPIO.setup(pin, GPIO.OUT)
 
-GPIO.output(ENA_1, GPIO.HIGH)
-GPIO.output(ENA_2, GPIO.HIGH)
+GPIO.output(ENA_1, GPIO.LOW)
+GPIO.output(ENA_2, GPIO.LOW)
 GPIO.output(DIR_1, GPIO.LOW)
 GPIO.output(DIR_2, GPIO.LOW)
 
@@ -34,17 +34,15 @@ def doSteps(motorNum, n, t):
     if n < 0:
         GPIO.output(dir_pin, GPIO.HIGH)
         sleep(0.5)
-    GPIO.output(ena_pin, GPIO.LOW)
+    GPIO.output(ena_pin, GPIO.HIGH)
 
     for i in range(numSteps):
-        if GPIO.input(LIMIT_SWITCH_PIN):
-            break
         GPIO.output(pul_pin, GPIO.LOW)
         sleep(t / 2)
         GPIO.output(pul_pin, GPIO.HIGH)
         sleep(t / 2)
 
-    GPIO.output(ena_pin, GPIO.HIGH)
+    GPIO.output(ena_pin, GPIO.LOW)
     if n < 0:
         GPIO.output(dir_pin, GPIO.LOW)
         sleep(0.5)
