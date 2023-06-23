@@ -4,10 +4,11 @@ import stepper
 import argparse
 import os
 import RPi.GPIO as GPIO
+from time import sleep
 
-TOTAL_STEPS = 14000
-STEPS_BOX = 3100
-STEPS_DELAY = 0.0005
+TOTAL_STEPS = 2400
+STEPS_BOX = -500
+STEPS_DELAY = 0.005
 BUTTON_PIN = 17
 
 STEPS_PAPER = 0
@@ -15,6 +16,7 @@ STEPS_RESIDUAL = int(TOTAL_STEPS / 2)
 STEPS_PLASTIC = TOTAL_STEPS
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(27, GPIO.OUT)
 GPIO.setup(BUTTON_PIN, GPIO.IN)
 
 parser = argparse.ArgumentParser()
@@ -88,12 +90,13 @@ def recognize(modelname, imgpath):
     print(f"  {imgpath}: {processed_preds[0][0][1]} to {processed_preds[0][0][2]}")
     return (processed_preds[0][0][1], processed_preds[0][0][2])
 
-try:
-    stepper.doSteps(1, -TOTAL_STEPS, STEPS_DELAY)
+currentPos = 0
+GPIO.output(27, GPIO.HIGH)
 
+try:
     print("Ready. Enter 'next' to classify a piece of trash.")
     while True:
-        if (bool(GPIO.input(BUTTON_PIN)) or input() == "next":
+        if (bool(GPIO.input(BUTTON_PIN))):
             os.system("libcamera-still -o img.jpg")
             res, prob = recognize(args['model'], 'img.jpg')
             print(res, prob)
@@ -114,6 +117,7 @@ try:
             stepper.doSteps(2, STEPS_BOX, STEPS_DELAY)
             stepper.doSteps(2, -STEPS_BOX, STEPS_DELAY)
             print("Ready. Enter 'next' to classify a piece of trash.")
+        sleep(0.01)
 
 except KeyboardInterrupt():
     pass
